@@ -21,12 +21,18 @@ app.get("/", function(req, res) {
 
 app.get("/api/:dateString?", function(req, res) {
   const dateString = req.params.dateString;
-  const isNan = isNaN(Number(dateString));
-  const date = isNan ? new Date(dateString) : new Date(Number(dateString));
-  if (date.toString() === "Invalid Date") {
-    res.json({ utc: "Invalid Date" });
+
+  if (!dateString && isNaN(Number(dateString))) {
+    const date = new Date();
+    res.json({ unix: date.getTime(), utc: date.toUTCString() });
   } else {
-    res.json({ unix: date.getTime(), utc: utc.toUTCString() });
+    const isNan = isNaN(Number(dateString));
+    const date = isNan ? new Date(dateString) : new Date(Number(dateString));
+    if (date.toString() === "Invalid Date") {
+      res.json({ error: "Invalid Date" });
+    } else {
+      res.json({ unix: date.getTime(), utc: date.toUTCString() });
+    }
   }
 });
 
